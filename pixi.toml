@@ -1,0 +1,18 @@
+[workspace]
+authors = ["khshmt <k.maher@mcsoil.com>"]
+channels = ["conda-forge", "robostack-humble"]
+name = "rclcpp_pixi_pub_sub"
+platforms = ["linux-64", "win-64"]
+version = "0.1.0"
+
+[dependencies]
+cmake = "*"
+ninja = "*"
+pkg-config = "*"
+compilers = "*"
+ros-humble-rclcpp = ">=16.0.13,<17"
+ros-humble-std-msgs = ">=4.9.0,<5"
+
+[tasks]
+clean = "rm -rf build"
+build = "cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build"
