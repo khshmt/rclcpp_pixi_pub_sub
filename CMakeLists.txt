@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(pub_sub_example)
+project(ros2_pixi_playground)
 
 if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 17)

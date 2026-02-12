@@ -1,7 +1,7 @@
 [workspace]
 authors = ["khshmt <khshmt2@gmail.com>"]
 channels = ["conda-forge", "robostack-humble"]
-name = "rclcpp_pixi_pub_sub"
+name = "ros2_pixi_playground"
 platforms = ["linux-64", "win-64"]
 version = "0.1.0"
 
