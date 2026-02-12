@@ -4,3 +4,6 @@
 
 # Build artifacts
 build/
+
+# run project artifacts
+my_bag/

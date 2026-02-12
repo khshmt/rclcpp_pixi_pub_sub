@@ -1,20 +1,32 @@
 #include "rclcpp/rclcpp.hpp"
+#include "sensor_msgs/msg/image.hpp"
 #include "std_msgs/msg/string.hpp"
 
-int main(int argc, char *argv[])
-{
-    rclcpp::init(argc, argv);
-    auto node = std::make_shared<rclcpp::Node>("publisher_node");
-    auto pub_ = node->create_publisher<std_msgs::msg::String>("my_topic", 10);
-    rclcpp::Rate loop_rate(10); // 10 Hz
-    while (rclcpp::ok())
-    {
-        std_msgs::msg::String msg;
-        msg.data = "Hello, ROS 2 with Pixi!";
-        pub_->publish(msg);
-        rclcpp::spin_some(node);
-        loop_rate.sleep();
-    }
-    rclcpp::shutdown();
-    return 0;
+class SimplePublisher : public rclcpp::Node {
+public:
+  SimplePublisher() : Node("simple_publisher") {
+    publisher_ = this->create_publisher<std_msgs::msg::String>("my_topic", 10);
+    timer_ = this->create_wall_timer(
+      std::chrono::milliseconds(100),
+      std::bind(&SimplePublisher::timer_callback, this));
+  }
+
+private:
+  void timer_callback() {
+    std_msgs::msg::String message;
+    message.set__data("Hello, ROS 2 with Pixi!");
+    RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
+    publisher_->publish(message);
+  }
+
+private:
+  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
+  rclcpp::TimerBase::SharedPtr timer_;
+};
+
+int main(int argc, char* argv[]) {
+  rclcpp::init(argc, argv);
+  rclcpp::spin(std::make_shared<SimplePublisher>());
+  rclcpp::shutdown();
+  return 0;
 }
