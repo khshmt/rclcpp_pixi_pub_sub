@@ -85,6 +85,11 @@ private:
   rclcpp::TimerBase::SharedPtr timer_;
   image_transport::CameraPublisher imagePublisher_;
 #ifdef _WIN32
+  /*
+    cv::VideoCapture on windows by default choose "Microsoft Media foundation" framework
+    which streams frames in YUYV format, which consumes the bandwidth, forcing CAP_DSHOW
+    enables "Microsoft DirectShow"
+  */
   cv::VideoCapture cap_{0, cv::CAP_DSHOW};
 #elif __LINUX__
   cv::VideoCapture cap_{0, cv::CAP_V4L2};
