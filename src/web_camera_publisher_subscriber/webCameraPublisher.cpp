@@ -11,6 +11,8 @@
 #include <image_transport/image_transport.hpp>
 #include <opencv2/opencv.hpp>
 
+#include <concurrentqueue.h>
+
 using namespace std::chrono_literals;
 
 class FramePublisher : public rclcpp::Node {
@@ -20,6 +22,16 @@ public:
       RCLCPP_FATAL(this->get_logger(), "Failed to open camera!!");
       rclcpp::shutdown();
     }
+    //Force MJPG
+    cap_.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
+    //Set resolution
+    cap_.set(cv::CAP_PROP_FRAME_WIDTH, 1280);
+    cap_.set(cv::CAP_PROP_FRAME_HEIGHT, 720);
+    //Set FPS
+    cap_.set(cv::CAP_PROP_FPS, 30);
+    //Reduce buffering
+    cap_.set(cv::CAP_PROP_BUFFERSIZE, 1);
+
     auto qos = rclcpp::SensorDataQoS().keep_last(1).best_effort();
     imagePublisher_ = image_transport::CameraPublisher(
       this, "/camera/image_raw", qos.get_rmw_qos_profile());
@@ -45,8 +57,7 @@ private:
     while (!stop_getting_frames_thread) {
       cv::Mat frame;
       if (cap_.read(frame)) [[likely]] {
-        std::lock_guard<std::mutex> lock_(m_);
-        imgs_queue_.emplace(frame);
+        imgs_queue_.enqueue(frame);
       } else [[unlikely]] {
         RCLCPP_INFO(this->get_logger(), "failed to open camera");
         return;
@@ -55,9 +66,10 @@ private:
   }
   void timer_callback() {
     cv::Mat frame;
-    if (!imgs_queue_.empty()) {
+    auto not_empty = imgs_queue_.try_dequeue(frame);
+    if (not_empty) {
       auto imageMsg_ =
-        cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", imgs_queue_.front())
+        cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", frame)
           .toImageMsg();
 
       sensor_msgs::msg::CameraInfo cameraInfoMsg_;
@@ -66,8 +78,6 @@ private:
       cameraInfoMsg_.width = imageMsg_->width;
 
       imagePublisher_.publish(*imageMsg_, cameraInfoMsg_);
-      std::lock_guard<std::mutex> lock_(m_);
-      imgs_queue_.pop();
     }
   }
 
@@ -75,13 +85,12 @@ private:
   rclcpp::TimerBase::SharedPtr timer_;
   image_transport::CameraPublisher imagePublisher_;
 #ifdef _WIN32
-  cv::VideoCapture cap_{0};
+  cv::VideoCapture cap_{0, cv::CAP_DSHOW};
 #elif __LINUX__
-  cv::VideoCapture cap_{0};
+  cv::VideoCapture cap_{0, cv::CAP_V4L2};
 #endif
-  std::queue<cv::Mat> imgs_queue_;
+  moodycamel::ConcurrentQueue<cv::Mat> imgs_queue_;
   std::thread getting_images_thread_;
-  std::mutex m_;
   std::atomic_bool stop_getting_frames_thread{false};
 };
 

@@ -24,6 +24,14 @@ find_package(cv_bridge REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(rerun_sdk REQUIRED)
 
+include(FetchContent)
+FetchContent_Declare(
+  concurrentqueue
+  GIT_REPOSITORY https://github.com/cameron314/concurrentqueue
+  GIT_TAG        v1.0.4
+)
+FetchContent_MakeAvailable(concurrentqueue)
+
 set(ROS2_DEPENDENCIES
     rclcpp::rclcpp
     ${std_msgs_TARGETS}
@@ -34,6 +42,7 @@ set(ROS2_DEPENDENCIES
     cv_bridge::cv_bridge
     image_transport::image_transport
     rerun_sdk
+    concurrentqueue
 )
 
 # ------------------------------------------------------------------------------
