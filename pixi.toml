@@ -31,5 +31,6 @@ build = "cmake --build build"
 
 publisher = "build/publisher"
 subscriber = "build/subscriber"
-usbCameraPublisher = "build/usbCameraPublisher"
-visualizer = "build/visualizer"
+webCameraPublisher = "build/webCameraPublisher"
+webCameraSubscriber = "build/webCameraSubscriber"
+webCameraFrameVisualizer = "build/webCameraFrameVisualizer"

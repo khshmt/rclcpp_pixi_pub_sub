@@ -40,7 +40,7 @@ set(ROS2_DEPENDENCIES
 # Publisher Executable
 # ------------------------------------------------------------------------------
 add_executable(publisher
-    src/publisher.cpp
+    src/simple_publisher_subscriber/publisher.cpp
 )
 
 target_link_libraries(publisher
@@ -51,7 +51,7 @@ target_link_libraries(publisher
 # Subscriber Executable
 # ------------------------------------------------------------------------------
 add_executable(subscriber
-    src/subscriber.cpp
+    src/simple_publisher_subscriber/subscriber.cpp
 )
 
 target_link_libraries(subscriber
@@ -61,21 +61,32 @@ target_link_libraries(subscriber
 # ------------------------------------------------------------------------------
 # usbCameraPublisher Executable
 # ------------------------------------------------------------------------------
-add_executable(usbCameraPublisher
-    src/usbCameraPublisher.cpp
+add_executable(webCameraPublisher
+    src/web_camera_publisher_subscriber/webCameraPublisher.cpp
 )
 
-target_link_libraries(usbCameraPublisher
+target_link_libraries(webCameraPublisher
     ${ROS2_DEPENDENCIES}
 )
 
 # ------------------------------------------------------------------------------
-# visualizer Executable
+# usbCameraSubscriber Executable
 # ------------------------------------------------------------------------------
-add_executable(visualizer
-    src/visualizer.cpp
+add_executable(webCameraSubscriber
+    src/web_camera_publisher_subscriber/webCameraSubscriber.cpp
 )
 
-target_link_libraries(visualizer
+target_link_libraries(webCameraSubscriber
+    ${ROS2_DEPENDENCIES}
+)
+
+# ------------------------------------------------------------------------------
+# usbCameraFrameVisualizer Executable
+# ------------------------------------------------------------------------------
+add_executable(webCameraFrameVisualizer
+    src/web_camera_publisher_subscriber/webCameraFrameVisualizer.cpp
+)
+
+target_link_libraries(webCameraFrameVisualizer
     ${ROS2_DEPENDENCIES}
 )
